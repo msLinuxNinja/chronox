@@ -1,6 +1,8 @@
 use std::env;
 use std::fs;
-use chrono::{DateTime, FixedOffset, Local, Utc};
+use chrono::{DateTime, FixedOffset, Utc};
+
+
 
 fn read_file_details(contents: String, tz_offset: &String) {
     let lines: Vec<&str> = contents.lines().collect();
