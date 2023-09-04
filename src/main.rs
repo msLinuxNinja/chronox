@@ -1,9 +1,9 @@
 use chrono::{DateTime, FixedOffset, Utc};
 use colored::Colorize;
+use rayon::prelude::*;
 use regex::Regex;
 use std::env;
 use std::fs;
-use rayon::prelude::*;
 
 // Todo:
 //      - Remove hardcoded year...
@@ -23,47 +23,27 @@ fn print_usage() {
     println!("Example: ./convert_time messages -06:00");
 }
 
-// fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
-//     let lines: Vec<&str> = contents.lines().collect();
-//     let mut data: Vec<String> = Vec::new();
-
-//     for line in lines.iter() {
-//         let columns: Vec<&str> = line.split_whitespace().take(3).collect();
-//         let date_str: String = format!(
-//             "2023-{}-{} {} {}", // todo, don't hardcode year...
-//             columns[0], columns[1], columns[2], tz_offset
-//         );
-//         let utc_date: DateTime<Utc> = get_time_utc(date_str);
-//         let utc_date_str: String = utc_date.to_string();
-//         let data_string: String = line
-//             .split_whitespace()
-//             .skip(3)
-//             .collect::<Vec<&str>>()
-//             .join(" ");
-//         let full_data_string: String = format!("{} {}", utc_date_str, data_string);
-//         data.push(full_data_string);
-//     }
-//     return data;
-// }
-
 fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
     let lines: Vec<&str> = contents.lines().collect();
 
-    let data: Vec<String> = lines.par_iter().map(|line| {
-        let columns: Vec<&str> = line.split_whitespace().take(3).collect();
-        let date_str: String = format!(
-            "2023-{}-{} {} {}", // todo, don't hardcode year...
-            columns[0], columns[1], columns[2], tz_offset
-        );
-        let utc_date: DateTime<Utc> = get_time_utc(date_str);
-        let utc_date_str: String = utc_date.to_string();
-        let data_string: String = line
-            .split_whitespace()
-            .skip(3)
-            .collect::<Vec<&str>>()
-            .join(" ");
-        format!("{} {}", utc_date_str, data_string)
-    }).collect();
+    let data: Vec<String> = lines
+        .par_iter()
+        .map(|line| {
+            let columns: Vec<&str> = line.split_whitespace().take(3).collect();
+            let date_str: String = format!(
+                "2023-{}-{} {} {}", // todo, don't hardcode year...
+                columns[0], columns[1], columns[2], tz_offset
+            );
+            let utc_date: DateTime<Utc> = get_time_utc(date_str);
+            let utc_date_str: String = utc_date.to_string();
+            let data_string: String = line
+                .split_whitespace()
+                .skip(3)
+                .collect::<Vec<&str>>()
+                .join(" ");
+            format!("{} {}", utc_date_str, data_string)
+        })
+        .collect();
     return data;
 }
 
