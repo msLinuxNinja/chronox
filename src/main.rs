@@ -42,14 +42,24 @@ fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-
+    println!("{}", args.len());
     match (args.get(1).map(|s: &String| s.as_str()), args.len()) {
         (None, 1) => {
             println!("No arguments provided");
             print_usage();
             return;
         }
+        (None, 2) => {
+            println!("No arguments provided");
+            print_usage();
+            return;
+        }
         (Some("-h") | Some("--help"), 2) => {
+            print_usage();
+            return;
+        }
+        (_, len) if len < 3 => {
+            println!("Too few arguments provided, utility requires at least 2 arguments");
             print_usage();
             return;
         }
