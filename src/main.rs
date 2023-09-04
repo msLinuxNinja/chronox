@@ -4,6 +4,11 @@ use regex::Regex;
 use std::env;
 use std::fs;
 
+// Todo:
+//      - Remove hardcoded year...
+//      - Some files have different time formats
+//      - When converting to UTC (function get_time_utc), it could error out due to wrong date format, need to add error handling
+
 fn get_time_utc(date_str: String) -> DateTime<Utc> {
     let date: Result<DateTime<FixedOffset>, chrono::ParseError> =
         DateTime::parse_from_str(&date_str, "%Y-%b-%d %H:%M:%S %z"); // Date format: 2023-Jan-01 01:00:00 +0000
@@ -42,7 +47,7 @@ fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    println!("{}", args.len());
+
     match (args.get(1).map(|s: &String| s.as_str()), args.len()) {
         (None, 1) => {
             println!("No arguments provided");
@@ -60,6 +65,11 @@ fn main() {
         }
         (_, len) if len < 3 => {
             println!("Too few arguments provided, utility requires at least 2 arguments");
+            print_usage();
+            return;
+        }
+        (_, len) if len > 3 => {
+            println!("Too many arguments provided, utility requires maximum 2 arguments");
             print_usage();
             return;
         }
