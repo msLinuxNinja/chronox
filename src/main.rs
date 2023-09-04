@@ -1,4 +1,5 @@
 use chrono::{DateTime, FixedOffset, Utc};
+use colored::Colorize;
 use regex::Regex;
 use std::env;
 use std::fs;
@@ -6,23 +7,8 @@ use std::fs;
 fn get_time_utc(date_str: String) -> DateTime<Utc> {
     let date: Result<DateTime<FixedOffset>, chrono::ParseError> =
         DateTime::parse_from_str(&date_str, "%Y-%b-%d %H:%M:%S %z"); // Date format: 2023-Jan-01 01:00:00 +0000
-    let utc_date: DateTime<Utc> = date.unwrap().with_timezone(&Utc);
-    print!("Local: {} \t", date.unwrap());
+    let utc_date: DateTime<Utc> = date.unwrap().with_timezone(&Utc); // this might error if file contains incorrect dates, need to fix
     return utc_date;
-}
-
-fn read_file_details(contents: String, tz_offset: &String) {
-    let lines: Vec<&str> = contents.lines().collect();
-    for line in lines.iter() {
-        let columns: Vec<&str> = line.split_whitespace().take(3).collect();
-        let date_str: String = format!(
-            "2023-{}-{} {} {}",
-            columns[0], columns[1], columns[2], tz_offset
-        );
-        let utc_date: DateTime<Utc> = get_time_utc(date_str);
-        print!("UTC: {}", utc_date);
-        println!();
-    }
 }
 
 fn print_usage() {
@@ -31,10 +17,33 @@ fn print_usage() {
     println!("Example: ./convert_time messages -06:00");
 }
 
+fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
+    let lines: Vec<&str> = contents.lines().collect();
+    let mut data: Vec<String> = Vec::new();
+
+    for line in lines.iter() {
+        let columns: Vec<&str> = line.split_whitespace().take(3).collect();
+        let date_str: String = format!(
+            "2023-{}-{} {} {}", // todo, don't hardcode year...
+            columns[0], columns[1], columns[2], tz_offset
+        );
+        let utc_date: DateTime<Utc> = get_time_utc(date_str);
+        let utc_date_str: String = utc_date.to_string();
+        let data_string: String = line
+            .split_whitespace()
+            .skip(3)
+            .collect::<Vec<&str>>()
+            .join(" ");
+        let full_data_string: String = format!("{} {}", utc_date_str, data_string);
+        data.push(full_data_string);
+    }
+    return data;
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    match (args.get(1).map(|s| s.as_str()), args.len()) {
+    match (args.get(1).map(|s: &String| s.as_str()), args.len()) {
         (None, 1) => {
             println!("No arguments provided");
             print_usage();
@@ -45,18 +54,24 @@ fn main() {
             return;
         }
         _ => {}
-    }   
+    }
 
     let filename: &String = &args[1];
     let tz_offset: &String = &args[2].to_string();
     let tz_pattern: Regex = Regex::new(r"^[+-](0[0-9]|1[0-4]):(00|30|45)$").unwrap(); // Pattern of timezone offset, should be +-HH:MM format
     if tz_pattern.is_match(tz_offset) == false {
-        println!("Invalid timezone offset format: {}", tz_offset);
+        println!("Invalid timezone offset format: {}", tz_offset.red());
+        println!("Correct format should be {}", "+-HH:MM".green());
         return;
     }
     match fs::read_to_string(filename) {
         Ok(contents) => {
-            read_file_details(contents, tz_offset);
+            let converted_data: Vec<String> = read_file_details(contents, tz_offset);
+            let file_name: String = format!("{}-chronox", filename);
+            std::fs::write(file_name.clone(), converted_data.join("\n"))
+                .expect("Failed to write the resulting file.");
+            println!("File saved as {}", file_name.blue());
+            println!("Original file has been kept");
         }
         Err(err) => {
             eprintln!("Error reading {}: {}", filename, err);
