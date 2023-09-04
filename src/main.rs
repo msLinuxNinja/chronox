@@ -24,13 +24,29 @@ fn read_file_details(contents: String, tz_offset: &String) {
         println!();
     }
 }
+
+fn print_usage() {
+    println!("Usage: <filename> <timezone offset in +-06:00 format>");
+    println!("Converts local time to UTC time");
+    println!("Example: ./convert_time messages -06:00");
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() != 3 {
-        println!("Usage: <filename> <timezone offset in +-05:00 format>");
-        return;
-    }
+    match (args.get(1).map(|s| s.as_str()), args.len()) {
+        (None, 1) => {
+            println!("No arguments provided");
+            print_usage();
+            return;
+        }
+        (Some("-h") | Some("--help"), 2) => {
+            print_usage();
+            return;
+        }
+        _ => {}
+    }   
+
     let filename: &String = &args[1];
     let tz_offset: &String = &args[2].to_string();
     let tz_pattern: Regex = Regex::new(r"^[+-](0[0-9]|1[0-4]):(00|30|45)$").unwrap(); // Pattern of timezone offset, should be +-HH:MM format
