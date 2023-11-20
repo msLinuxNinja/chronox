@@ -86,7 +86,7 @@ fn main() {
         println!("Correct format should be {}", "+-HH:MM".green());
         return;
     }
-    match fs::read_to_string(filename) {
+    match fs::read_to_string(filename) { // main logic
         Ok(contents) => {
             let converted_data: Vec<String> = read_file_details(contents, tz_offset);
             let file_name: String = format!("{}-chronox", filename);
@@ -96,7 +96,7 @@ fn main() {
             println!("Original file has been kept");
         }
         Err(err) => {
-            eprintln!("Error reading {}: {}", filename, err);
+            eprintln!("Error reading {}: {}", filename, err.to_string().red());
         }
     }
 }
