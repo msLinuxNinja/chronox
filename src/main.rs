@@ -1,10 +1,11 @@
+use chrono::Datelike;
 use chrono::{DateTime, FixedOffset, Utc};
 use colored::Colorize;
 use rayon::prelude::*;
 use regex::Regex;
 use std::env;
 use std::fs;
-
+use std::process;
 // Todo:
 //      - Remove hardcoded year...
 //      - Some files have different time formats
@@ -13,26 +14,37 @@ use std::fs;
 fn get_time_utc(date_str: String) -> DateTime<Utc> {
     let date: Result<DateTime<FixedOffset>, chrono::ParseError> =
         DateTime::parse_from_str(&date_str, "%Y-%b-%d %H:%M:%S %z"); // Date format: 2023-Jan-01 01:00:00 +0000
-    let utc_date: DateTime<Utc> = date.unwrap().with_timezone(&Utc); // this might error if file contains incorrect dates, need to fix
-    return utc_date;
+    match date {
+        Ok(_) => {
+            let utc_date: DateTime<Utc> = date.unwrap().with_timezone(&Utc); // this might error if file contains incorrect dates, need to fix
+            return utc_date;
+        }
+        Err(err) => {
+            eprintln!("Error parsing date: {}", err.to_string().red());
+            eprintln!("Date string should be in 'Month Day HH:MM:SS' format'");
+            process::exit(1);
+        }
+    }
 }
 
 fn print_usage() {
     println!("Usage: <filename> <timezone offset in +-06:00 format>");
-    println!("Converts local time to UTC time");
+    println!("Converts log time entries to UTC time");
     println!("Example: ./convert_time messages -06:00");
 }
 
 fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
     let lines: Vec<&str> = contents.lines().collect();
+    let now: DateTime<Utc> = Utc::now();
+    let current_year = now.year();
 
     let data: Vec<String> = lines
         .par_iter()
         .map(|line| {
             let columns: Vec<&str> = line.split_whitespace().take(3).collect();
             let date_str: String = format!(
-                "2023-{}-{} {} {}", // todo, don't hardcode year...
-                columns[0], columns[1], columns[2], tz_offset
+                "{}-{}-{} {} {}", // todo, don't hardcode year...
+                current_year, columns[0], columns[1], columns[2], tz_offset
             );
             let utc_date: DateTime<Utc> = get_time_utc(date_str);
             let utc_date_str: String = utc_date.to_string();
@@ -86,7 +98,8 @@ fn main() {
         println!("Correct format should be {}", "+-HH:MM".green());
         return;
     }
-    match fs::read_to_string(filename) { // main logic
+    match fs::read_to_string(filename) {
+        // main logic
         Ok(contents) => {
             let converted_data: Vec<String> = read_file_details(contents, tz_offset);
             let file_name: String = format!("{}-chronox", filename);
