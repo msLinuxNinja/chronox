@@ -6,17 +6,14 @@ use regex::Regex;
 use std::env;
 use std::fs;
 use std::process;
-// Todo:
-//      - Remove hardcoded year...
-//      - Some files have different time formats
-//      - When converting to UTC (function get_time_utc), it could error out due to wrong date format, need to add error handling
+
 
 fn get_time_utc(date_str: String) -> DateTime<Utc> {
     let date: Result<DateTime<FixedOffset>, chrono::ParseError> =
         DateTime::parse_from_str(&date_str, "%Y-%b-%d %H:%M:%S %z"); // Date format: 2023-Jan-01 01:00:00 +0000
     match date {
         Ok(_) => {
-            let utc_date: DateTime<Utc> = date.unwrap().with_timezone(&Utc); // this might error if file contains incorrect dates, need to fix
+            let utc_date: DateTime<Utc> = date.unwrap().with_timezone(&Utc);
             return utc_date;
         }
         Err(err) => {
