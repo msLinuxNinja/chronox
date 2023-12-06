@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset, Utc, Datelike};
+use chrono::{DateTime, FixedOffset, Utc};
 use colored::Colorize;
 use rayon::prelude::*;
 use regex::Regex;
