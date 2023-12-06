@@ -1,5 +1,4 @@
-use chrono::Datelike;
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, FixedOffset, Utc, Datelike};
 use colored::Colorize;
 use rayon::prelude::*;
 use regex::Regex;
@@ -27,7 +26,7 @@ fn get_time_utc(date_str: String) -> DateTime<Utc> {
 fn print_usage() {
     println!("Usage: <filename> <timezone offset in +-06:00 format>");
     println!("Converts log time entries to UTC time");
-    println!("Example: ./convert_time messages -06:00");
+    println!("Example: ./chronox messages -06:00");
 }
 
 fn read_file_details(contents: String, tz_offset: &String) -> Vec<String> {
