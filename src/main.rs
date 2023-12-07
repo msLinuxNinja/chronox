@@ -1,11 +1,10 @@
-use chrono::{DateTime, FixedOffset, Utc, Datelike};
+use chrono::{DateTime, Datelike, FixedOffset, Utc};
 use colored::Colorize;
 use rayon::prelude::*;
 use regex::Regex;
 use std::env;
 use std::fs;
 use std::process;
-
 
 fn get_time_utc(date_str: String) -> DateTime<Utc> {
     let date: Result<DateTime<FixedOffset>, chrono::ParseError> =

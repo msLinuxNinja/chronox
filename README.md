@@ -1,6 +1,8 @@
 # chronox
+=======
 A simple Rust utility to convert log files from local time to UTC 🦀.
 
+[![GitHub Super-Linter](https://github.com/msLinuxNinja/chronox/actions/workflows/linter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 It takes dates in `Month Day HH:MM:SS` format and converts it to `YYYY-MM-DD HH:MM:SS Z` format.
 
