@@ -24,8 +24,8 @@ fn get_time_utc(date_str: String) -> DateTime<Utc> {
 }
 
 fn print_usage() {
-    println!("Usage: <filename> <timezone offset in +-06:00 format>");
-    println!("Converts log time entries to UTC time");
+    println!("Usage: ./chronox <filename> <timezone offset in +-06:00 format>");
+    println!("Converts log time entries to UTC");
     println!("Example: ./chronox messages -06:00");
 }
 
