@@ -28,7 +28,14 @@ A file with the suffix `-chronox` will be saved in the same directory as the ori
 
 # Downloading
 
-Grab one of the binaries from the [releases page]().
+Grab one of the binaries from the [releases page](https://github.com/msLinuxNinja/chronox/releases/tag/0.1.0) for the corresponding Operating System.
+
+Or download directly by running:
+
+```bash
+wget https://github.com/msLinuxNinja/chronox/releases/download/0.1.0/chronox
+chmod +x chronox
+```
 
 # Gotchas
 
