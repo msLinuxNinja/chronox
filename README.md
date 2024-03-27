@@ -1,10 +1,8 @@
 # chronox
-=======
+
 A simple Rust utility to convert log files from local time to UTC 🦀.
 
-[![GitHub Super-Linter](https://github.com/msLinuxNinja/chronox/actions/workflows/linter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
-
-It takes dates in `Month Day HH:MM:SS` format and converts it to `YYYY-MM-DD HH:MM:SS Z` format.
+It takes dates in `Month Day HH:MM:SS` format and converts it to `YYYY-MM-DD HH:MM:SS Z` ISO8601 standard.
 
 For example using a -06:00 offset:
 
@@ -13,18 +11,22 @@ Aug 27 00:00:00 host systemd[1]: Reloaded httpd.service - The Apache HTTP Server
 ```
 
 Gets converted to:
+
 ```
 2023-08-27 06:00:00 UTC host systemd[1]: Reloaded httpd.service - The Apache HTTP Server.
 ```
 
 # Usage
+
 `chronox` can be used from the command line with the following syntax:
 
 ```bash
 chronox [logfile] [timezone offset]
 ```
 
-The timezone offset needs to be in `-+00:00` format.
+> [!IMPORTANT]
+> The timezone offset from UTC needs to be in `-+00:00` format.
+> For example `-06:00`.
 
 A file with the suffix `-chronox` will be saved in the same directory as the original file.
 
@@ -41,5 +43,5 @@ chmod +x chronox
 
 # Gotchas
 
-* The utility assumes the year is current year.
-* Only files that use `Month Day HH:MM:SS` format would work (Like `messages` or `syslog`).
+- The utility assumes the year is current year.
+- Only files that use `Month Day HH:MM:SS` format would work (Like `messages` or `syslog`).
